@@ -34,7 +34,7 @@ This is an explanation
 ## Interactive Chart
 
 
-<div id='chart1' class='rChart nvd3'></div>
+<div id = 'chart1' class = 'rChart nvd3'></div>
 <script type='text/javascript'>
  $(document).ready(function(){
       drawchart1()
@@ -55,112 +55,127 @@ This is an explanation
  "Hair": "Black",
 "Eye": "Brown",
 "Sex": "Male",
-"Freq":     32 
+"Freq":             32 
 },
 {
  "Hair": "Brown",
 "Eye": "Brown",
 "Sex": "Male",
-"Freq":     53 
+"Freq":             53 
 },
 {
  "Hair": "Red",
 "Eye": "Brown",
 "Sex": "Male",
-"Freq":     10 
+"Freq":             10 
 },
 {
  "Hair": "Blond",
 "Eye": "Brown",
 "Sex": "Male",
-"Freq":      3 
+"Freq":              3 
 },
 {
  "Hair": "Black",
 "Eye": "Blue",
 "Sex": "Male",
-"Freq":     11 
+"Freq":             11 
 },
 {
  "Hair": "Brown",
 "Eye": "Blue",
 "Sex": "Male",
-"Freq":     50 
+"Freq":             50 
 },
 {
  "Hair": "Red",
 "Eye": "Blue",
 "Sex": "Male",
-"Freq":     10 
+"Freq":             10 
 },
 {
  "Hair": "Blond",
 "Eye": "Blue",
 "Sex": "Male",
-"Freq":     30 
+"Freq":             30 
 },
 {
  "Hair": "Black",
 "Eye": "Hazel",
 "Sex": "Male",
-"Freq":     10 
+"Freq":             10 
 },
 {
  "Hair": "Brown",
 "Eye": "Hazel",
 "Sex": "Male",
-"Freq":     25 
+"Freq":             25 
 },
 {
  "Hair": "Red",
 "Eye": "Hazel",
 "Sex": "Male",
-"Freq":      7 
+"Freq":              7 
 },
 {
  "Hair": "Blond",
 "Eye": "Hazel",
 "Sex": "Male",
-"Freq":      5 
+"Freq":              5 
 },
 {
  "Hair": "Black",
 "Eye": "Green",
 "Sex": "Male",
-"Freq":      3 
+"Freq":              3 
 },
 {
  "Hair": "Brown",
 "Eye": "Green",
 "Sex": "Male",
-"Freq":     15 
+"Freq":             15 
 },
 {
  "Hair": "Red",
 "Eye": "Green",
 "Sex": "Male",
-"Freq":      7 
+"Freq":              7 
 },
 {
  "Hair": "Blond",
 "Eye": "Green",
 "Sex": "Male",
-"Freq":      8 
+"Freq":              8 
 } 
 ]
   
-      var data = d3.nest()
-        .key(function(d){
-          return opts.group === undefined ? 'main' : d[opts.group]
+      if(!(opts.type==="pieChart" || opts.type==="sparklinePlus" || opts.type==="bulletChart")) {
+        var data = d3.nest()
+          .key(function(d){
+            //return opts.group === undefined ? 'main' : d[opts.group]
+            //instead of main would think a better default is opts.x
+            return opts.group === undefined ? opts.y : d[opts.group];
+          })
+          .entries(data);
+      }
+      
+      if (opts.disabled != undefined){
+        data.map(function(d, i){
+          d.disabled = opts.disabled[i]
         })
-        .entries(data)
+      }
       
       nv.addGraph(function() {
         var chart = nv.models[opts.type]()
-          .x(function(d) { return d[opts.x] })
-          .y(function(d) { return d[opts.y] })
           .width(opts.width)
           .height(opts.height)
+          
+        if (opts.type != "bulletChart"){
+          chart
+            .x(function(d) { return d[opts.x] })
+            .y(function(d) { return d[opts.y] })
+        }
+          
          
         
           
@@ -182,41 +197,43 @@ This is an explanation
     };
 </script>
 
-
 --- &interactive
 
 ## Interactive Console
 
 <textarea class='interactive' id='interactive{{slide.num}}' data-cell='{{slide.num}}' data-results='asis' style='display:none'>require(googleVis)
 M1 <- gvisMotionChart(Fruits, idvar = 'Fruit', timevar = 'Year')
-print(M1, tag = 'chart')
-</textarea>
-
+print(M1, tag = 'chart')</textarea>
 
 ---
 
 ## Interactive Chart with Shiny Controls
 
 <div class="row-fluid">
-  <div class="span4">
+  <div class="col-sm-4">
     <form class="well">
-      <label class="control-label" for="sex">Choose Sex</label>
-      <select id="sex">
-        <option value="Male" selected="selected">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <label class="control-label" for="type">Choose Type</label>
-      <select id="type">
-        <option value="multiBarChart" selected="selected">multiBarChart</option>
-        <option value="multiBarHorizontalChart">multiBarHorizontalChart</option>
-      </select>
+      <div class="form-group shiny-input-container">
+        <label class="control-label" for="sex">Choose Sex</label>
+        <div>
+          <select id="sex"><option value="Male" selected>Male</option>
+<option value="Female">Female</option></select>
+          <script type="application/json" data-for="sex" data-nonempty="">{}</script>
+        </div>
+      </div>
+      <div class="form-group shiny-input-container">
+        <label class="control-label" for="type">Choose Type</label>
+        <div>
+          <select id="type"><option value="multiBarChart" selected>multiBarChart</option>
+<option value="multiBarHorizontalChart">multiBarHorizontalChart</option></select>
+          <script type="application/json" data-for="type" data-nonempty="">{}</script>
+        </div>
+      </div>
     </form>
   </div>
-  <div class="span8">
+  <div class="col-sm-8">
     <div id="nvd3plot" class="shiny-html-output nvd3 rChart"></div>
   </div>
 </div>
-
 
 --- &interactive
 
@@ -228,9 +245,7 @@ a$chart(type = "spline")
 a$series(data = c(1, 3, 2, 4, 5, 4, 6, 2, 3, 5, NA), dashStyle = "longdash")
 a$series(data = c(NA, 4, 1, 3, 4, 2, 9, 1, 2, 3, 4), dashStyle = "shortdot")
 a$legend(symbolWidth = 80)
-a$print('chart3')
-</textarea>
-
+a$print('chart3')</textarea>
 
 --- &interactive
 
@@ -238,9 +253,7 @@ a$print('chart3')
 
 <textarea class='interactive' id='interactive{{slide.num}}' data-cell='{{slide.num}}' data-results='markup' style='display:none'>require(xtable)
 options(xtable.type = 'html')
-xtable(head(mtcars))
-</textarea>
-
+xtable(head(mtcars))</textarea>
 
 
 
